@@ -4,13 +4,17 @@ import { useNavigation } from '@react-navigation/native';
 import { COLORS, SESSION_DEFAULTS } from '../utils/constants';
 import { useSession } from '../state/SessionContext';
 import { useSettings } from '../state/SettingsContext';
+import { useMetrics } from '../state/MetricsContext';
 import { SessionState } from '../models/Session';
 import { useSessionTimer, formatTime } from '../hooks/useSessionTimer';
+import CameraView from '../components/CameraView';
+import FatigueIndicator from '../components/FatigueIndicator';
 
 export default function SessionScreen() {
   const navigation = useNavigation();
   const { currentState, pauseSession, resumeSession, endSession, completeBreak } = useSession();
   const { settings } = useSettings();
+  const { currentFatigueScore, processFaceData } = useMetrics();
 
   // Determine timer duration based on current state
   const isBreak = currentState === SessionState.BREAK;
@@ -87,16 +91,26 @@ export default function SessionScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Camera Preview (if enabled) */}
+      {settings.cameraEnabled && (
+        <View style={styles.cameraContainer}>
+          <CameraView
+            enabled={settings.cameraEnabled && currentState === SessionState.WORKING}
+            onFaceData={processFaceData}
+          />
+        </View>
+      )}
+
       <View style={styles.timerContainer}>
         <Text style={styles.timer}>{formatTime(timerState.remainingMs)}</Text>
         <Text style={styles.timerLabel}>{timerLabel}</Text>
       </View>
 
-      <View style={styles.fatigueContainer}>
-        <Text style={styles.fatigueLabel}>Fatigue Level</Text>
-        <Text style={styles.fatigueValue}>Low</Text>
-        <Text style={styles.fatigueSubtext}>(Camera disabled)</Text>
-      </View>
+      {/* Fatigue Indicator */}
+      <FatigueIndicator
+        score={currentFatigueScore}
+        cameraEnabled={settings.cameraEnabled}
+      />
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
@@ -120,6 +134,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+  },
+  cameraContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    zIndex: 10,
   },
   title: {
     fontSize: 24,

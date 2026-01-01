@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
 import { COLORS } from '../utils/constants';
 import { useSettings } from '../state/SettingsContext';
+import ConsentModal from '../components/ConsentModal';
 
 export default function SettingsScreen() {
   const { settings, updateSettings } = useSettings();
+  const [showConsentModal, setShowConsentModal] = useState(false);
+
+  const handleCameraToggle = async (value: boolean) => {
+    if (value && !settings.cameraEnabled) {
+      // Show consent modal when enabling camera
+      setShowConsentModal(true);
+    } else {
+      // Directly disable camera
+      await updateSettings({ cameraEnabled: false });
+    }
+  };
+
+  const handleConsentAccept = async () => {
+    setShowConsentModal(false);
+    await updateSettings({ cameraEnabled: true });
+  };
+
+  const handleConsentDecline = () => {
+    setShowConsentModal(false);
+  };
 
   const handleToggle = async (key: keyof typeof settings, value: boolean) => {
     try {
@@ -30,7 +51,7 @@ export default function SettingsScreen() {
           </View>
           <Switch
             value={settings.cameraEnabled}
-            onValueChange={(value) => handleToggle('cameraEnabled', value)}
+            onValueChange={handleCameraToggle}
             trackColor={{ false: '#CCC', true: COLORS.primary }}
           />
         </View>
@@ -74,6 +95,12 @@ export default function SettingsScreen() {
           All camera processing happens on your device. No images are ever stored or uploaded.
         </Text>
       </View>
+
+      <ConsentModal
+        visible={showConsentModal}
+        onAccept={handleConsentAccept}
+        onDecline={handleConsentDecline}
+      />
     </ScrollView>
   );
 }
