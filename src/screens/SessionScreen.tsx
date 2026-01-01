@@ -9,12 +9,20 @@ import { SessionState } from '../models/Session';
 import { useSessionTimer, formatTime } from '../hooks/useSessionTimer';
 import CameraView from '../components/CameraView';
 import FatigueIndicator from '../components/FatigueIndicator';
+import BreakRecommendationModal from '../components/BreakRecommendationModal';
 
 export default function SessionScreen() {
   const navigation = useNavigation();
   const { currentState, pauseSession, resumeSession, endSession, completeBreak } = useSession();
   const { settings } = useSettings();
-  const { currentFatigueScore, processFaceData } = useMetrics();
+  const {
+    currentFatigueScore,
+    currentRecommendation,
+    processFaceData,
+    acceptRecommendation,
+    snoozeRecommendation,
+    ignoreRecommendation,
+  } = useMetrics();
 
   // Determine timer duration based on current state
   const isBreak = currentState === SessionState.BREAK;
@@ -123,6 +131,14 @@ export default function SessionScreen() {
           <Text style={styles.buttonText}>End</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Break Recommendation Modal */}
+      <BreakRecommendationModal
+        recommendation={currentRecommendation}
+        onAccept={acceptRecommendation}
+        onSnooze={snoozeRecommendation}
+        onIgnore={ignoreRecommendation}
+      />
     </View>
   );
 }
