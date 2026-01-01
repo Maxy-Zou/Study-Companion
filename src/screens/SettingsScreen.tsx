@@ -1,11 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
 import { COLORS } from '../utils/constants';
+import { useSettings } from '../state/SettingsContext';
 
 export default function SettingsScreen() {
-  const [cameraEnabled, setCameraEnabled] = React.useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
-  const [azureTelemetryEnabled, setAzureTelemetryEnabled] = React.useState(false);
+  const { settings, updateSettings } = useSettings();
+
+  const handleToggle = async (key: keyof typeof settings, value: boolean) => {
+    try {
+      await updateSettings({ [key]: value });
+    } catch (error) {
+      console.error('Failed to update setting:', error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -22,8 +29,8 @@ export default function SettingsScreen() {
             </Text>
           </View>
           <Switch
-            value={cameraEnabled}
-            onValueChange={setCameraEnabled}
+            value={settings.cameraEnabled}
+            onValueChange={(value) => handleToggle('cameraEnabled', value)}
             trackColor={{ false: '#CCC', true: COLORS.primary }}
           />
         </View>
@@ -36,8 +43,8 @@ export default function SettingsScreen() {
             </Text>
           </View>
           <Switch
-            value={azureTelemetryEnabled}
-            onValueChange={setAzureTelemetryEnabled}
+            value={settings.azureTelemetryEnabled}
+            onValueChange={(value) => handleToggle('azureTelemetryEnabled', value)}
             trackColor={{ false: '#CCC', true: COLORS.primary }}
           />
         </View>
@@ -54,8 +61,8 @@ export default function SettingsScreen() {
             </Text>
           </View>
           <Switch
-            value={notificationsEnabled}
-            onValueChange={setNotificationsEnabled}
+            value={settings.notificationsEnabled}
+            onValueChange={(value) => handleToggle('notificationsEnabled', value)}
             trackColor={{ false: '#CCC', true: COLORS.primary }}
           />
         </View>
