@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../utils/constants';
 import { useSession } from '../state/SessionContext';
 import { SessionStorage } from '../services/storageService';
@@ -11,21 +11,23 @@ export default function HomeScreen() {
   const { startSession, currentState } = useSession();
   const [weeklySessionCount, setWeeklySessionCount] = useState(0);
 
-  // Load weekly session count
-  useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const sessions = await SessionStorage.getAll();
-        const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-        const recentSessions = sessions.filter(s => s.startTs > oneWeekAgo);
-        setWeeklySessionCount(recentSessions.length);
-      } catch (error) {
-        console.error('Failed to load weekly sessions:', error);
-      }
-    };
-
-    loadStats();
+  // Load weekly session count whenever screen comes into focus
+  const loadStats = useCallback(async () => {
+    try {
+      const sessions = await SessionStorage.getAll();
+      const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      const recentSessions = sessions.filter(s => s.startTs > oneWeekAgo);
+      setWeeklySessionCount(recentSessions.length);
+    } catch (error) {
+      console.error('Failed to load weekly sessions:', error);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadStats();
+    }, [loadStats])
+  );
 
   const handleStartSession = () => {
     startSession();

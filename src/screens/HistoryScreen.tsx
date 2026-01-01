@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../utils/constants';
 import { Session } from '../models/Session';
 import { Metrics } from '../models/Metrics';
@@ -22,9 +23,12 @@ export default function HistoryScreen() {
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  // Reload data whenever screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   const loadData = async () => {
     try {

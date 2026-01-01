@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, Alert } from 'react-native';
+import { Camera } from 'expo-camera';
 import { COLORS } from '../utils/constants';
 import { useSettings } from '../state/SettingsContext';
 import ConsentModal from '../components/ConsentModal';
@@ -20,7 +21,19 @@ export default function SettingsScreen() {
 
   const handleConsentAccept = async () => {
     setShowConsentModal(false);
-    await updateSettings({ cameraEnabled: true });
+
+    // Request OS-level camera permission
+    const { status } = await Camera.requestCameraPermissionsAsync();
+
+    if (status === 'granted') {
+      await updateSettings({ cameraEnabled: true });
+    } else {
+      Alert.alert(
+        'Camera Permission Required',
+        'Please enable camera access in your device settings to use fatigue detection.',
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   const handleConsentDecline = () => {

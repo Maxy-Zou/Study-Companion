@@ -17,7 +17,9 @@ export interface FaceData {
 export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
   const [permission, requestPermission] = useCameraPermissions();
   const [hasError, setHasError] = useState(false);
+  const [faceDetected, setFaceDetected] = useState(false);
   const processingRef = useRef(false);
+  const faceDetectedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Request permission when enabled
   useEffect(() => {
@@ -25,6 +27,15 @@ export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
       requestPermission();
     }
   }, [enabled]);
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (faceDetectedTimeoutRef.current) {
+        clearTimeout(faceDetectedTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleFacesDetected = ({ faces }: FaceDetector.FaceDetectionResult) => {
     if (processingRef.current || !enabled || !onFaceData) return;
@@ -35,9 +46,21 @@ export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
     }, CAMERA_CONFIG.FRAME_CAPTURE_INTERVAL_MS);
 
     if (faces.length === 0) {
-      // No face detected - ignore this frame
+      // No face detected - set indicator to red
+      setFaceDetected(false);
       return;
     }
+
+    // Face detected - set indicator to green
+    setFaceDetected(true);
+
+    // Reset indicator after 3 seconds if no new faces detected
+    if (faceDetectedTimeoutRef.current) {
+      clearTimeout(faceDetectedTimeoutRef.current);
+    }
+    faceDetectedTimeoutRef.current = setTimeout(() => {
+      setFaceDetected(false);
+    }, 3000);
 
     // Use first detected face
     const face = faces[0];
@@ -109,6 +132,18 @@ export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
           Alert.alert('Camera Error', 'Failed to initialize camera. Using timer-only mode.');
         }}
       />
+      {/* Face detection indicator */}
+      <View style={styles.indicatorContainer}>
+        <View
+          style={[
+            styles.indicator,
+            { backgroundColor: faceDetected ? COLORS.success : COLORS.danger },
+          ]}
+        />
+        <Text style={styles.indicatorText}>
+          {faceDetected ? 'Face detected' : 'No face'}
+        </Text>
+      </View>
       <View style={styles.overlay}>
         <Text style={styles.overlayText}>Analyzing fatigue...</Text>
       </View>
@@ -126,6 +161,28 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
+  },
+  indicatorContainer: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  indicatorText: {
+    color: COLORS.white,
+    fontSize: 9,
+    fontWeight: '600',
   },
   overlay: {
     position: 'absolute',
