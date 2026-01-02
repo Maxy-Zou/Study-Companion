@@ -1,17 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { COLORS } from '../utils/constants';
+import { useSettings } from '../state/SettingsContext';
 
 // Screens
 import HomeScreen from '../screens/HomeScreen';
 import SessionScreen from '../screens/SessionScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 
 const Tab = createBottomTabNavigator();
 
 export default function AppNavigator() {
+  const { settings, updateSettings } = useSettings();
+  const [showOnboarding, setShowOnboarding] = useState(!settings.privacyAckVersion);
+
+  const handleOnboardingComplete = async () => {
+    // Mark onboarding as complete
+    await updateSettings({ privacyAckVersion: '1.0' });
+    setShowOnboarding(false);
+  };
+
+  // Show onboarding if user hasn't completed it
+  if (showOnboarding) {
+    return (
+      <NavigationContainer>
+        <OnboardingScreen onComplete={handleOnboardingComplete} />
+      </NavigationContainer>
+    );
+  }
+
   return (
     <NavigationContainer>
       <Tab.Navigator

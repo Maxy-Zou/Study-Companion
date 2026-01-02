@@ -12,7 +12,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
   cameraEnabled: false,
   defaultWorkMinutes: 25,
   defaultBreakMinutes: 5,
-  privacyAckVersion: '1.0',
+  privacyAckVersion: '',  // Empty until onboarding complete
   notificationsEnabled: true,
   userId: '',  // Will be generated on first run
   azureTelemetryEnabled: false,
