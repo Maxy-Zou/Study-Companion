@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { Camera } from 'expo-camera';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { COLORS } from '../utils/constants';
 import { useSettings } from '../state/SettingsContext';
+
+// Conditionally import Camera (only on native platforms)
+let Camera: any;
+if (Platform.OS !== 'web') {
+  Camera = require('expo-camera').Camera;
+}
 
 interface OnboardingScreenProps {
   onComplete: () => void;
@@ -15,6 +20,16 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   const { updateSettings } = useSettings();
 
   const handleCameraEnable = async () => {
+    // On web, camera not available
+    if (Platform.OS === 'web') {
+      Alert.alert(
+        'Camera Not Available',
+        'Camera features only work on mobile apps. You can still use the app with timer-based breaks.',
+        [{ text: 'OK', onPress: () => setCurrentStep(2) }]
+      );
+      return;
+    }
+
     const { status } = await Camera.requestCameraPermissionsAsync();
 
     if (status === 'granted') {

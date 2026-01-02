@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import { CameraView as ExpoCameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView as ExpoCameraView, useCameraPermissions } from 'expo-camera';
 import * as FaceDetector from 'expo-face-detector';
 import { COLORS, CAMERA_CONFIG } from '../utils/constants';
 
@@ -37,7 +37,7 @@ export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
     };
   }, []);
 
-  const handleFacesDetected = ({ faces }: FaceDetector.FaceDetectionResult) => {
+  const handleFacesDetected = ({ faces }: any) => {
     if (processingRef.current || !enabled || !onFaceData) return;
 
     processingRef.current = true;

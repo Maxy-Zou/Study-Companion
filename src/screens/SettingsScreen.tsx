@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, Alert } from 'react-native';
-import { Camera } from 'expo-camera';
+import { View, Text, StyleSheet, ScrollView, Switch, Alert, Platform } from 'react-native';
 import { COLORS } from '../utils/constants';
 import { useSettings } from '../state/SettingsContext';
 import ConsentModal from '../components/ConsentModal';
+
+// Conditionally import Camera (only on native platforms)
+let Camera: any;
+if (Platform.OS !== 'web') {
+  Camera = require('expo-camera').Camera;
+}
 
 export default function SettingsScreen() {
   const { settings, updateSettings } = useSettings();
@@ -21,6 +26,16 @@ export default function SettingsScreen() {
 
   const handleConsentAccept = async () => {
     setShowConsentModal(false);
+
+    // On web, camera not available
+    if (Platform.OS === 'web') {
+      Alert.alert(
+        'Camera Not Available',
+        'Camera features only work on mobile apps.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
 
     // Request OS-level camera permission
     const { status } = await Camera.requestCameraPermissionsAsync();
