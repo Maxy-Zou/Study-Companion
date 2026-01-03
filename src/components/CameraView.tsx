@@ -1,8 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
-import { CameraView as ExpoCameraView, useCameraPermissions } from 'expo-camera';
-import * as FaceDetector from 'expo-face-detector';
 import { COLORS, CAMERA_CONFIG } from '../utils/constants';
+
+// Try to import camera modules - will fail in Expo Go
+let ExpoCameraView: any = null;
+let useCameraPermissions: any = () => [null, () => {}];
+let FaceDetector: any = null;
+
+try {
+  const CameraModule = require('expo-camera');
+  ExpoCameraView = CameraModule.CameraView;
+  useCameraPermissions = CameraModule.useCameraPermissions;
+} catch (e) {
+  console.log('Camera not available in Expo Go');
+}
+
+try {
+  FaceDetector = require('expo-face-detector');
+} catch (e) {
+  console.log('Face detector not available in Expo Go');
+}
 
 interface CameraViewProps {
   enabled: boolean;
@@ -15,6 +32,18 @@ export interface FaceData {
 }
 
 export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
+  // If camera modules not available (Expo Go), show message
+  if (!ExpoCameraView || !FaceDetector) {
+    return (
+      <View style={styles.disabledContainer}>
+        <Text style={styles.disabledText}>Camera Not Available</Text>
+        <Text style={styles.disabledSubtext}>
+          Requires development build. Using timer-only mode.
+        </Text>
+      </View>
+    );
+  }
+
   const [permission, requestPermission] = useCameraPermissions();
   const [hasError, setHasError] = useState(false);
   const [faceDetected, setFaceDetected] = useState(false);
