@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
-import { BreakRecommendation } from '../models/Recommendation';
-import { COLORS } from '../utils/constants';
+import * as React from "react";
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from "react-native";
+import { BreakRecommendation } from "../models/Recommendation";
+import { COLORS } from "../utils/constants";
 
 interface BreakRecommendationModalProps {
   recommendation: BreakRecommendation | null;
@@ -21,16 +21,16 @@ export default function BreakRecommendationModal({
   // Get icon and color based on type
   const getTypeInfo = (type: string) => {
     switch (type) {
-      case 'TIME_BASED':
-        return { icon: '⏰', color: COLORS.primary };
-      case 'EYE_STRAIN':
-        return { icon: '👁️', color: COLORS.warning };
-      case 'MOVEMENT':
-        return { icon: '🚶', color: COLORS.success };
-      case 'FATIGUE':
-        return { icon: '😴', color: COLORS.danger };
+      case "TIME_BASED":
+        return { icon: "⏰", color: COLORS.primary };
+      case "EYE_STRAIN":
+        return { icon: "👁️", color: COLORS.warning };
+      case "MOVEMENT":
+        return { icon: "🚶", color: COLORS.success };
+      case "FATIGUE":
+        return { icon: "😴", color: COLORS.danger };
       default:
-        return { icon: '💡', color: COLORS.primary };
+        return { icon: "💡", color: COLORS.primary };
     }
   };
 
@@ -41,7 +41,7 @@ export default function BreakRecommendationModal({
     if (minutes < 1) {
       return `${Math.round(minutes * 60)} seconds`;
     } else if (minutes === 1) {
-      return '1 minute';
+      return "1 minute";
     } else {
       return `${Math.round(minutes)} minutes`;
     }
@@ -57,7 +57,9 @@ export default function BreakRecommendationModal({
       <View style={styles.overlay}>
         <View style={styles.container}>
           {/* Icon */}
-          <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
+          <View
+            style={[styles.iconContainer, { backgroundColor: color + "20" }]}
+          >
             <Text style={styles.icon}>{icon}</Text>
           </View>
 
@@ -92,7 +94,10 @@ export default function BreakRecommendationModal({
               <Text style={styles.snoozeButtonText}>Snooze 5m</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.acceptButton, { backgroundColor: color }]} onPress={onAccept}>
+            <TouchableOpacity
+              style={[styles.acceptButton, { backgroundColor: color }]}
+              onPress={onAccept}
+            >
               <Text style={styles.acceptButtonText}>Take Break</Text>
             </TouchableOpacity>
           </View>
@@ -110,8 +115,8 @@ export default function BreakRecommendationModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "flex-end",
   },
   container: {
     backgroundColor: COLORS.white,
@@ -124,9 +129,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
     marginBottom: 20,
   },
   icon: {
@@ -134,22 +139,22 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.text,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 12,
   },
   message: {
     fontSize: 16,
     color: COLORS.text,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 24,
     marginBottom: 20,
   },
   durationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 16,
     gap: 8,
   },
@@ -159,23 +164,23 @@ const styles = StyleSheet.create({
   },
   durationValue: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   urgentBadge: {
-    backgroundColor: COLORS.danger + '20',
+    backgroundColor: COLORS.danger + "20",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginBottom: 20,
   },
   urgentText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.danger,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
     marginBottom: 16,
   },
@@ -185,11 +190,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: COLORS.textLight,
-    alignItems: 'center',
+    alignItems: "center",
   },
   ignoreButtonText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
   },
   snoozeButton: {
@@ -197,28 +202,28 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: COLORS.background,
-    alignItems: 'center',
+    alignItems: "center",
   },
   snoozeButtonText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
   },
   acceptButton: {
     flex: 1.5,
     paddingVertical: 14,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   acceptButtonText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.white,
   },
   footnote: {
     fontSize: 12,
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 16,
   },
 });

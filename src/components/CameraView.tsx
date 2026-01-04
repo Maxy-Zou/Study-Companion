@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-import { COLORS, CAMERA_CONFIG } from '../utils/constants';
+import * as React from "react";
+import { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
+import { COLORS, CAMERA_CONFIG } from "../utils/constants";
 
 // Try to import camera modules - will fail in Expo Go
 let ExpoCameraView: any = null;
@@ -8,17 +9,17 @@ let useCameraPermissions: any = () => [null, () => {}];
 let FaceDetector: any = null;
 
 try {
-  const CameraModule = require('expo-camera');
+  const CameraModule = require("expo-camera");
   ExpoCameraView = CameraModule.CameraView;
   useCameraPermissions = CameraModule.useCameraPermissions;
 } catch (e) {
-  console.log('Camera not available in Expo Go');
+  console.log("Camera not available in Expo Go");
 }
 
 try {
-  FaceDetector = require('expo-face-detector');
+  FaceDetector = require("expo-face-detector");
 } catch (e) {
-  console.log('Face detector not available in Expo Go');
+  console.log("Face detector not available in Expo Go");
 }
 
 interface CameraViewProps {
@@ -27,7 +28,7 @@ interface CameraViewProps {
 }
 
 export interface FaceData {
-  eyeOpennessAvg: number;  // 0.0-1.0 scale
+  eyeOpennessAvg: number; // 0.0-1.0 scale
   timestamp: number;
 }
 
@@ -111,7 +112,9 @@ export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
     return (
       <View style={styles.disabledContainer}>
         <Text style={styles.disabledText}>Camera Disabled</Text>
-        <Text style={styles.disabledSubtext}>Enable in Settings for fatigue detection</Text>
+        <Text style={styles.disabledSubtext}>
+          Enable in Settings for fatigue detection
+        </Text>
       </View>
     );
   }
@@ -155,10 +158,13 @@ export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
           minDetectionInterval: CAMERA_CONFIG.FRAME_CAPTURE_INTERVAL_MS,
           tracking: true,
         }}
-        onMountError={(error) => {
-          console.error('Camera mount error:', error);
+        onMountError={(error: unknown) => {
+          console.error("Camera mount error:", error);
           setHasError(true);
-          Alert.alert('Camera Error', 'Failed to initialize camera. Using timer-only mode.');
+          Alert.alert(
+            "Camera Error",
+            "Failed to initialize camera. Using timer-only mode."
+          );
         }}
       />
       {/* Face detection indicator */}
@@ -170,7 +176,7 @@ export default function CameraView({ enabled, onFaceData }: CameraViewProps) {
           ]}
         />
         <Text style={styles.indicatorText}>
-          {faceDetected ? 'Face detected' : 'No face'}
+          {faceDetected ? "Face detected" : "No face"}
         </Text>
       </View>
       <View style={styles.overlay}>
@@ -185,19 +191,19 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: COLORS.text,
   },
   camera: {
     flex: 1,
   },
   indicatorContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 8,
     right: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
@@ -211,21 +217,21 @@ const styles = StyleSheet.create({
   indicatorText: {
     color: COLORS.white,
     fontSize: 9,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   overlay: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     padding: 6,
-    alignItems: 'center',
+    alignItems: "center",
   },
   overlayText: {
     color: COLORS.white,
     fontSize: 10,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   disabledContainer: {
     width: 120,
@@ -234,21 +240,21 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderWidth: 2,
     borderColor: COLORS.textLight,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 12,
   },
   disabledText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 4,
   },
   disabledSubtext: {
     fontSize: 10,
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

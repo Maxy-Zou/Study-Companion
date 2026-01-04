@@ -1,23 +1,26 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
-import { COLORS } from '../utils/constants';
-import { DailyFatigueData } from '../utils/statsAggregator';
+import * as React from "react";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { LineChart } from "react-native-chart-kit";
+import { COLORS } from "../utils/constants";
+import { DailyFatigueData } from "../utils/statsAggregator";
 
 interface MetricsChartProps {
   data: DailyFatigueData[];
   title?: string;
 }
 
-export default function MetricsChart({ data, title = '7-Day Fatigue Trend' }: MetricsChartProps) {
-  const screenWidth = Dimensions.get('window').width - 40; // Account for padding
+export default function MetricsChart({
+  data,
+  title = "7-Day Fatigue Trend",
+}: MetricsChartProps) {
+  const screenWidth = Dimensions.get("window").width - 40; // Account for padding
 
   // Prepare chart data
   const prepareChartData = () => {
     if (data.length === 0) {
       // Show empty state with placeholder data
       return {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         datasets: [
           {
             data: [0, 0, 0, 0, 0, 0, 0],
@@ -34,7 +37,9 @@ export default function MetricsChart({ data, title = '7-Day Fatigue Trend' }: Me
     // Create labels from dates (show day of week)
     const labels = last7Days.map((d) => {
       const date = new Date(d.date);
-      return date.toLocaleDateString('en-US', { weekday: 'short' }).substring(0, 3);
+      return date
+        .toLocaleDateString("en-US", { weekday: "short" })
+        .substring(0, 3);
     });
 
     // Extract fatigue scores
@@ -74,13 +79,13 @@ export default function MetricsChart({ data, title = '7-Day Fatigue Trend' }: Me
             borderRadius: 16,
           },
           propsForDots: {
-            r: '5',
-            strokeWidth: '2',
+            r: "5",
+            strokeWidth: "2",
             stroke: COLORS.primary,
           },
           propsForBackgroundLines: {
-            strokeDasharray: '', // solid line
-            stroke: '#E0E0E0',
+            strokeDasharray: "", // solid line
+            stroke: "#E0E0E0",
             strokeWidth: 1,
           },
         }}
@@ -95,22 +100,30 @@ export default function MetricsChart({ data, title = '7-Day Fatigue Trend' }: Me
       {!hasData && (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No session data yet</Text>
-          <Text style={styles.emptySubtext}>Start a session to see your fatigue trends</Text>
+          <Text style={styles.emptySubtext}>
+            Start a session to see your fatigue trends
+          </Text>
         </View>
       )}
 
       {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: COLORS.success }]} />
+          <View
+            style={[styles.legendDot, { backgroundColor: COLORS.success }]}
+          />
           <Text style={styles.legendText}>Low Fatigue (0-30)</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: COLORS.warning }]} />
+          <View
+            style={[styles.legendDot, { backgroundColor: COLORS.warning }]}
+          />
           <Text style={styles.legendText}>Moderate (30-60)</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: COLORS.danger }]} />
+          <View
+            style={[styles.legendDot, { backgroundColor: COLORS.danger }]}
+          />
           <Text style={styles.legendText}>High (60-100)</Text>
         </View>
       </View>
@@ -127,7 +140,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 16,
   },
@@ -136,16 +149,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   emptyState: {
-    position: 'absolute',
-    top: '50%',
+    position: "absolute",
+    top: "50%",
     left: 0,
     right: 0,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   emptyText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textLight,
     marginBottom: 4,
   },
@@ -154,16 +167,16 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
   },
   legend: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: "#E0E0E0",
   },
   legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   legendDot: {
     width: 10,

@@ -1,19 +1,30 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
-import { COLORS } from '../utils/constants';
-import { useSettings } from '../state/SettingsContext';
+import * as React from "react";
+import { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Platform,
+} from "react-native";
+import { COLORS } from "../utils/constants";
+import { useSettings } from "../state/SettingsContext";
 
 // Conditionally import Camera (only on native platforms)
 let Camera: any;
-if (Platform.OS !== 'web') {
-  Camera = require('expo-camera').Camera;
+if (Platform.OS !== "web") {
+  Camera = require("expo-camera").Camera;
 }
 
 interface OnboardingScreenProps {
   onComplete: () => void;
 }
 
-export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
+export default function OnboardingScreen({
+  onComplete,
+}: OnboardingScreenProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [workMinutes, setWorkMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
@@ -21,25 +32,25 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
   const handleCameraEnable = async () => {
     // On web, camera not available
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       Alert.alert(
-        'Camera Not Available',
-        'Camera features only work on mobile apps. You can still use the app with timer-based breaks.',
-        [{ text: 'OK', onPress: () => setCurrentStep(2) }]
+        "Camera Not Available",
+        "Camera features only work on mobile apps. You can still use the app with timer-based breaks.",
+        [{ text: "OK", onPress: () => setCurrentStep(2) }]
       );
       return;
     }
 
     const { status } = await Camera.requestCameraPermissionsAsync();
 
-    if (status === 'granted') {
+    if (status === "granted") {
       await updateSettings({ cameraEnabled: true });
       setCurrentStep(2);
     } else {
       Alert.alert(
-        'Camera Permission Denied',
-        'You can enable camera later in Settings.',
-        [{ text: 'OK', onPress: () => setCurrentStep(2) }]
+        "Camera Permission Denied",
+        "You can enable camera later in Settings.",
+        [{ text: "OK", onPress: () => setCurrentStep(2) }]
       );
     }
   };
@@ -53,7 +64,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     await updateSettings({
       defaultWorkMinutes: workMinutes,
       defaultBreakMinutes: breakMinutes,
-      privacyAckVersion: '1.0',
+      privacyAckVersion: "1.0",
     });
 
     onComplete();
@@ -63,15 +74,20 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     <View style={styles.stepContainer}>
       <Text style={styles.emoji}>👋</Text>
       <Text style={styles.title}>Welcome to Study Companion</Text>
-      <Text style={styles.subtitle}>Privacy-First Mental Fatigue Management</Text>
+      <Text style={styles.subtitle}>
+        Privacy-First Mental Fatigue Management
+      </Text>
 
       <View style={styles.featureList}>
         <View style={styles.featureItem}>
           <Text style={styles.featureIcon}>🧠</Text>
           <View style={styles.featureText}>
-            <Text style={styles.featureTitle}>Adaptive Break Recommendations</Text>
+            <Text style={styles.featureTitle}>
+              Adaptive Break Recommendations
+            </Text>
             <Text style={styles.featureDescription}>
-              Get personalized break suggestions based on your actual fatigue levels
+              Get personalized break suggestions based on your actual fatigue
+              levels
             </Text>
           </View>
         </View>
@@ -91,13 +107,17 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
           <View style={styles.featureText}>
             <Text style={styles.featureTitle}>100% Private</Text>
             <Text style={styles.featureDescription}>
-              All processing happens on your device. No images stored or uploaded.
+              All processing happens on your device. No images stored or
+              uploaded.
             </Text>
           </View>
         </View>
       </View>
 
-      <TouchableOpacity style={styles.primaryButton} onPress={() => setCurrentStep(1)}>
+      <TouchableOpacity
+        style={styles.primaryButton}
+        onPress={() => setCurrentStep(1)}
+      >
         <Text style={styles.primaryButtonText}>Get Started</Text>
       </TouchableOpacity>
     </View>
@@ -111,10 +131,18 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
       <View style={styles.privacyBox}>
         <Text style={styles.privacyTitle}>What We Do:</Text>
-        <Text style={styles.privacyItem}>✓ Analyze your face every 2 seconds (optional)</Text>
-        <Text style={styles.privacyItem}>✓ Calculate blink rate and eye openness</Text>
-        <Text style={styles.privacyItem}>✓ Process everything on your device</Text>
-        <Text style={styles.privacyItem}>✓ Store only numeric metrics (never images)</Text>
+        <Text style={styles.privacyItem}>
+          ✓ Analyze your face every 2 seconds (optional)
+        </Text>
+        <Text style={styles.privacyItem}>
+          ✓ Calculate blink rate and eye openness
+        </Text>
+        <Text style={styles.privacyItem}>
+          ✓ Process everything on your device
+        </Text>
+        <Text style={styles.privacyItem}>
+          ✓ Store only numeric metrics (never images)
+        </Text>
       </View>
 
       <View style={[styles.privacyBox, styles.privacyDanger]}>
@@ -125,13 +153,21 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
         <Text style={styles.privacyItem}>✗ Identify or recognize you</Text>
       </View>
 
-      <Text style={styles.cameraQuestion}>Enable camera for fatigue detection?</Text>
+      <Text style={styles.cameraQuestion}>
+        Enable camera for fatigue detection?
+      </Text>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.secondaryButton} onPress={handleSkipCamera}>
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={handleSkipCamera}
+        >
           <Text style={styles.secondaryButtonText}>Skip for Now</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.primaryButton} onPress={handleCameraEnable}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={handleCameraEnable}
+        >
           <Text style={styles.primaryButtonText}>Enable Camera</Text>
         </TouchableOpacity>
       </View>
@@ -142,7 +178,9 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     <View style={styles.stepContainer}>
       <Text style={styles.emoji}>⚙️</Text>
       <Text style={styles.title}>Customize Your Sessions</Text>
-      <Text style={styles.subtitle}>Set your preferred work and break durations</Text>
+      <Text style={styles.subtitle}>
+        Set your preferred work and break durations
+      </Text>
 
       <View style={styles.settingsContainer}>
         <Text style={styles.settingLabel}>Work Duration</Text>
@@ -186,10 +224,14 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
         </View>
       </View>
 
-      <Text style={styles.settingsNote}>You can change these anytime in Settings</Text>
+      <Text style={styles.settingsNote}>
+        You can change these anytime in Settings
+      </Text>
 
       <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
-        <Text style={styles.primaryButtonText}>Start Using Study Companion</Text>
+        <Text style={styles.primaryButtonText}>
+          Start Using Study Companion
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -240,8 +282,8 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   emoji: {
     fontSize: 64,
@@ -249,24 +291,24 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.text,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 40,
   },
   featureList: {
-    width: '100%',
+    width: "100%",
     marginBottom: 40,
   },
   featureItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 20,
     backgroundColor: COLORS.white,
     padding: 16,
@@ -281,7 +323,7 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 4,
   },
@@ -291,7 +333,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   privacyBox: {
-    width: '100%',
+    width: "100%",
     backgroundColor: COLORS.white,
     padding: 20,
     borderRadius: 12,
@@ -304,7 +346,7 @@ const styles = StyleSheet.create({
   },
   privacyTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 12,
   },
@@ -316,25 +358,25 @@ const styles = StyleSheet.create({
   },
   cameraQuestion: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 20,
   },
   settingsContainer: {
-    width: '100%',
+    width: "100%",
     marginBottom: 30,
   },
   settingLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 12,
     marginTop: 20,
   },
   durationPicker: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 20,
@@ -344,21 +386,21 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   durationButtonText: {
     fontSize: 24,
     color: COLORS.white,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   durationDisplay: {
     marginHorizontal: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   durationValue: {
     fontSize: 48,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.primary,
   },
   durationUnit: {
@@ -369,13 +411,13 @@ const styles = StyleSheet.create({
   settingsNote: {
     fontSize: 13,
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
   },
   buttonRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
-    width: '100%',
+    width: "100%",
   },
   primaryButton: {
     flex: 1,
@@ -383,12 +425,12 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   primaryButtonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   secondaryButton: {
     flex: 1,
@@ -396,19 +438,19 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 2,
     borderColor: COLORS.textLight,
   },
   secondaryButtonText: {
     color: COLORS.text,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   stepIndicator: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 20,
     gap: 8,
   },

@@ -1,21 +1,24 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../utils/constants';
+import * as React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { COLORS } from "../utils/constants";
 
 interface FatigueIndicatorProps {
   score: number; // 0-100
   cameraEnabled: boolean;
 }
 
-export default function FatigueIndicator({ score, cameraEnabled }: FatigueIndicatorProps) {
+export default function FatigueIndicator({
+  score,
+  cameraEnabled,
+}: FatigueIndicatorProps) {
   // Determine color and label based on score
   const getFatigueLevel = (score: number): { label: string; color: string } => {
     if (score < 30) {
-      return { label: 'Low', color: COLORS.success };
+      return { label: "Low", color: COLORS.success };
     } else if (score < 60) {
-      return { label: 'Moderate', color: COLORS.warning };
+      return { label: "Moderate", color: COLORS.warning };
     } else {
-      return { label: 'High', color: COLORS.danger };
+      return { label: "High", color: COLORS.danger };
     }
   };
 
@@ -69,35 +72,34 @@ export default function FatigueIndicator({ score, cameraEnabled }: FatigueIndica
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
   label: {
     fontSize: 14,
     color: COLORS.textLight,
     marginBottom: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   gaugeContainer: {
-    width: '80%',
+    width: "80%",
     marginBottom: 16,
   },
   gaugeBackground: {
     height: 12,
     backgroundColor: COLORS.background,
     borderRadius: 6,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: '#DDD',
+    borderColor: "#DDD",
   },
   gaugeFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: 5,
-    transition: 'width 0.3s ease',
   },
   gaugeLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 4,
   },
   gaugeLabelText: {
@@ -105,12 +107,12 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
   },
   statusContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 8,
   },
   statusValue: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   statusSubtext: {
@@ -120,6 +122,6 @@ const styles = StyleSheet.create({
   scoreText: {
     fontSize: 13,
     color: COLORS.textLight,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

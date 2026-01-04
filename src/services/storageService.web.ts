@@ -52,7 +52,7 @@ export const SessionStorage = {
   },
 
   async cleanup(): Promise<void> {
-    const cutoffTime = Date.now() - DATA_RETENTION.SESSION_DAYS * 24 * 60 * 60 * 1000;
+    const cutoffTime = Date.now() - DATA_RETENTION.DAYS_TO_KEEP * 24 * 60 * 60 * 1000;
     const sessions = await this.getAll();
     const filtered = sessions.filter(s => s.startTs > cutoffTime);
     await AsyncStorage.setItem(SESSIONS_KEY, JSON.stringify(filtered));
@@ -98,7 +98,7 @@ export const MetricsStorage = {
   },
 
   async cleanup(): Promise<void> {
-    const cutoffTime = Date.now() - DATA_RETENTION.METRICS_DAYS * 24 * 60 * 60 * 1000;
+    const cutoffTime = Date.now() - DATA_RETENTION.DAYS_TO_KEEP * 24 * 60 * 60 * 1000;
     const metrics = await this.getAll();
     const filtered = metrics.filter(m => m.ts > cutoffTime);
     await AsyncStorage.setItem(METRICS_KEY, JSON.stringify(filtered));
@@ -109,7 +109,7 @@ export const MetricsStorage = {
 export const SettingsStorage = {
   async get(): Promise<UserSettings> {
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.USER_SETTINGS);
+      const data = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (data) {
         return JSON.parse(data);
       }
@@ -122,7 +122,7 @@ export const SettingsStorage = {
 
   async save(settings: UserSettings): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.USER_SETTINGS, JSON.stringify(settings));
+      await AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
     } catch (error) {
       console.error('Failed to save settings:', error);
       throw error;

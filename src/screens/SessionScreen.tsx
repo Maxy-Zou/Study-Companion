@@ -1,19 +1,26 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { COLORS, SESSION_DEFAULTS } from '../utils/constants';
-import { useSession } from '../state/SessionContext';
-import { useSettings } from '../state/SettingsContext';
-import { useMetrics } from '../state/MetricsContext';
-import { SessionState } from '../models/Session';
-import { useSessionTimer, formatTime } from '../hooks/useSessionTimer';
-import CameraView from '../components/CameraView';
-import FatigueIndicator from '../components/FatigueIndicator';
-import BreakRecommendationModal from '../components/BreakRecommendationModal';
+import * as React from "react";
+import { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { COLORS } from "../utils/constants";
+import { useSession } from "../state/SessionContext";
+import { useSettings } from "../state/SettingsContext";
+import { useMetrics } from "../state/MetricsContext";
+import { SessionState } from "../models/Session";
+import { useSessionTimer, formatTime } from "../hooks/useSessionTimer";
+import CameraView from "../components/CameraView";
+import FatigueIndicator from "../components/FatigueIndicator";
+import BreakRecommendationModal from "../components/BreakRecommendationModal";
 
 export default function SessionScreen() {
   const navigation = useNavigation();
-  const { currentState, pauseSession, resumeSession, endSession, completeBreak } = useSession();
+  const {
+    currentState,
+    pauseSession,
+    resumeSession,
+    endSession,
+    completeBreak,
+  } = useSession();
   const { settings } = useSettings();
   const {
     currentFatigueScore,
@@ -24,37 +31,55 @@ export default function SessionScreen() {
     ignoreRecommendation,
   } = useMetrics();
 
-  // Determine timer duration based on current state
-  const isBreak = currentState === SessionState.BREAK;
-  const timerDuration = isBreak ? settings.defaultBreakMinutes : settings.defaultWorkMinutes;
+  /**
+   * Track whether we are in WORK or BREAK mode.
+   * PAUSED does NOT change the mode.
+   */
+  const lastActiveModeRef = useRef<"WORK" | "BREAK">("WORK");
+
+  if (currentState === SessionState.BREAK) {
+    lastActiveModeRef.current = "BREAK";
+  } else if (currentState === SessionState.WORKING) {
+    lastActiveModeRef.current = "WORK";
+  }
+
+  const isBreak = lastActiveModeRef.current === "BREAK";
+
+  const timerDuration = isBreak
+    ? settings.defaultBreakMinutes
+    : settings.defaultWorkMinutes;
 
   const [timerState, timerControls] = useSessionTimer({
     durationMinutes: timerDuration,
     autoStart: true,
     onComplete: () => {
       if (isBreak) {
-        // Break completed, return to work
         completeBreak();
       } else {
-        // Work block completed, could trigger break recommendation here
-        Alert.alert('Work Block Complete', 'Time for a break!');
+        Alert.alert("Work Block Complete", "Time for a break!");
       }
     },
   });
 
-  // Reset timer when switching between work/break
+  /**
+   * Reset timer ONLY when switching between WORK <-> BREAK
+   */
   useEffect(() => {
     timerControls.setDuration(timerDuration);
-    if (currentState === SessionState.WORKING || currentState === SessionState.BREAK) {
-      timerControls.start();
-    }
-  }, [currentState]);
+    timerControls.start();
+  }, [timerDuration]);
 
-  // Handle pause/resume based on session state
+  /**
+   * Pause / resume WITHOUT touching duration
+   */
   useEffect(() => {
     if (currentState === SessionState.PAUSED && timerState.isRunning) {
       timerControls.pause();
-    } else if (currentState === SessionState.WORKING && !timerState.isRunning && !timerState.isCompleted) {
+    } else if (
+      currentState !== SessionState.PAUSED &&
+      !timerState.isRunning &&
+      !timerState.isCompleted
+    ) {
       timerControls.resume();
     }
   }, [currentState]);
@@ -68,42 +93,47 @@ export default function SessionScreen() {
   };
 
   const handleEnd = () => {
-    Alert.alert(
-      'End Session',
-      'Are you sure you want to end this session?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'End',
-          style: 'destructive',
-          onPress: () => {
-            endSession();
-            navigation.navigate('Home' as never);
-          },
+    Alert.alert("End Session", "Are you sure you want to end this session?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "End",
+        style: "destructive",
+        onPress: () => {
+          endSession();
+          navigation.navigate("Home" as never);
         },
-      ]
-    );
+      },
+    ]);
   };
 
   if (currentState === SessionState.IDLE) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>No Active Session</Text>
-        <Text style={styles.subtitle}>Start a session from the Home screen</Text>
+        <Text style={styles.subtitle}>
+          Start a session from the Home screen
+        </Text>
       </View>
     );
   }
 
-  const timerLabel = isBreak ? 'Break Time' : currentState === SessionState.PAUSED ? 'Paused' : 'Work Time';
-  const pauseButtonText = currentState === SessionState.PAUSED ? 'Resume' : 'Pause';
+  const timerLabel = isBreak
+    ? "Break Time"
+    : currentState === SessionState.PAUSED
+    ? "Paused"
+    : "Work Time";
+
+  const pauseButtonText =
+    currentState === SessionState.PAUSED ? "Resume" : "Pause";
 
   return (
     <View style={styles.container}>
-      {/* Camera Preview (if enabled) */}
       {settings.cameraEnabled && (
         <View style={styles.cameraContainer}>
           <CameraView
-            enabled={settings.cameraEnabled && currentState === SessionState.WORKING}
+            enabled={
+              settings.cameraEnabled && currentState === SessionState.WORKING
+            }
             onFaceData={processFaceData}
           />
         </View>
@@ -114,7 +144,6 @@ export default function SessionScreen() {
         <Text style={styles.timerLabel}>{timerLabel}</Text>
       </View>
 
-      {/* Fatigue Indicator */}
       <FatigueIndicator
         score={currentFatigueScore}
         cameraEnabled={settings.cameraEnabled}
@@ -127,12 +156,15 @@ export default function SessionScreen() {
         >
           <Text style={styles.buttonText}>{pauseButtonText}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.endButton]} onPress={handleEnd}>
+
+        <TouchableOpacity
+          style={[styles.button, styles.endButton]}
+          onPress={handleEnd}
+        >
           <Text style={styles.buttonText}>End</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Break Recommendation Modal */}
       <BreakRecommendationModal
         recommendation={currentRecommendation}
         onAccept={acceptRecommendation}
@@ -147,34 +179,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   cameraContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 20,
     right: 20,
     zIndex: 10,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.text,
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 16,
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
   },
   timerContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 40,
   },
   timer: {
     fontSize: 64,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.primary,
   },
   timerLabel: {
@@ -182,27 +214,8 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
     marginTop: 10,
   },
-  fatigueContainer: {
-    alignItems: 'center',
-    marginBottom: 60,
-  },
-  fatigueLabel: {
-    fontSize: 14,
-    color: COLORS.textLight,
-    marginBottom: 5,
-  },
-  fatigueValue: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: COLORS.success,
-  },
-  fatigueSubtext: {
-    fontSize: 12,
-    color: COLORS.textLight,
-    marginTop: 4,
-  },
   buttonRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 20,
   },
   button: {
@@ -219,6 +232,255 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
+
+// import * as React from "react";
+// import { useEffect } from "react";
+// import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+// import { useNavigation } from "@react-navigation/native";
+// import { COLORS, SESSION_DEFAULTS } from "../utils/constants";
+// import { useSession } from "../state/SessionContext";
+// import { useSettings } from "../state/SettingsContext";
+// import { useMetrics } from "../state/MetricsContext";
+// import { SessionState } from "../models/Session";
+// import { useSessionTimer, formatTime } from "../hooks/useSessionTimer";
+// import CameraView from "../components/CameraView";
+// import FatigueIndicator from "../components/FatigueIndicator";
+// import BreakRecommendationModal from "../components/BreakRecommendationModal";
+
+// export default function SessionScreen() {
+//   const navigation = useNavigation();
+//   const {
+//     currentState,
+//     pauseSession,
+//     resumeSession,
+//     endSession,
+//     completeBreak,
+//   } = useSession();
+//   const { settings } = useSettings();
+//   const {
+//     currentFatigueScore,
+//     currentRecommendation,
+//     processFaceData,
+//     acceptRecommendation,
+//     snoozeRecommendation,
+//     ignoreRecommendation,
+//   } = useMetrics();
+
+//   // Determine timer duration based on current state
+//   const isBreak = currentState === SessionState.BREAK;
+//   const timerDuration = isBreak
+//     ? settings.defaultBreakMinutes
+//     : settings.defaultWorkMinutes;
+
+//   const [timerState, timerControls] = useSessionTimer({
+//     durationMinutes: timerDuration,
+//     autoStart: true,
+//     onComplete: () => {
+//       if (isBreak) {
+//         // Break completed, return to work
+//         completeBreak();
+//       } else {
+//         // Work block completed, could trigger break recommendation here
+//         Alert.alert("Work Block Complete", "Time for a break!");
+//       }
+//     },
+//   });
+
+//   // Reset timer when switching between work/break
+//   useEffect(() => {
+//     timerControls.setDuration(timerDuration);
+//     if (
+//       currentState === SessionState.WORKING ||
+//       currentState === SessionState.BREAK
+//     ) {
+//       timerControls.start();
+//     }
+//   }, [currentState]);
+
+//   // Handle pause/resume based on session state
+//   useEffect(() => {
+//     if (currentState === SessionState.PAUSED && timerState.isRunning) {
+//       timerControls.pause();
+//     } else if (
+//       currentState === SessionState.WORKING &&
+//       !timerState.isRunning &&
+//       !timerState.isCompleted
+//     ) {
+//       timerControls.resume();
+//     }
+//   }, [currentState]);
+
+//   const handlePauseResume = () => {
+//     if (currentState === SessionState.PAUSED) {
+//       resumeSession();
+//     } else {
+//       pauseSession();
+//     }
+//   };
+
+//   const handleEnd = () => {
+//     Alert.alert("End Session", "Are you sure you want to end this session?", [
+//       { text: "Cancel", style: "cancel" },
+//       {
+//         text: "End",
+//         style: "destructive",
+//         onPress: () => {
+//           endSession();
+//           navigation.navigate("Home" as never);
+//         },
+//       },
+//     ]);
+//   };
+
+//   if (currentState === SessionState.IDLE) {
+//     return (
+//       <View style={styles.container}>
+//         <Text style={styles.title}>No Active Session</Text>
+//         <Text style={styles.subtitle}>
+//           Start a session from the Home screen
+//         </Text>
+//       </View>
+//     );
+//   }
+
+//   const timerLabel = isBreak
+//     ? "Break Time"
+//     : currentState === SessionState.PAUSED
+//     ? "Paused"
+//     : "Work Time";
+//   const pauseButtonText =
+//     currentState === SessionState.PAUSED ? "Resume" : "Pause";
+
+//   return (
+//     <View style={styles.container}>
+//       {/* Camera Preview (if enabled) */}
+//       {settings.cameraEnabled && (
+//         <View style={styles.cameraContainer}>
+//           <CameraView
+//             enabled={
+//               settings.cameraEnabled && currentState === SessionState.WORKING
+//             }
+//             onFaceData={processFaceData}
+//           />
+//         </View>
+//       )}
+
+//       <View style={styles.timerContainer}>
+//         <Text style={styles.timer}>{formatTime(timerState.remainingMs)}</Text>
+//         <Text style={styles.timerLabel}>{timerLabel}</Text>
+//       </View>
+
+//       {/* Fatigue Indicator */}
+//       <FatigueIndicator
+//         score={currentFatigueScore}
+//         cameraEnabled={settings.cameraEnabled}
+//       />
+
+//       <View style={styles.buttonRow}>
+//         <TouchableOpacity
+//           style={[styles.button, styles.pauseButton]}
+//           onPress={handlePauseResume}
+//         >
+//           <Text style={styles.buttonText}>{pauseButtonText}</Text>
+//         </TouchableOpacity>
+//         <TouchableOpacity
+//           style={[styles.button, styles.endButton]}
+//           onPress={handleEnd}
+//         >
+//           <Text style={styles.buttonText}>End</Text>
+//         </TouchableOpacity>
+//       </View>
+
+//       {/* Break Recommendation Modal */}
+//       <BreakRecommendationModal
+//         recommendation={currentRecommendation}
+//         onAccept={acceptRecommendation}
+//         onSnooze={snoozeRecommendation}
+//         onIgnore={ignoreRecommendation}
+//       />
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: COLORS.background,
+//     alignItems: "center",
+//     justifyContent: "center",
+//     padding: 20,
+//   },
+//   cameraContainer: {
+//     position: "absolute",
+//     top: 20,
+//     right: 20,
+//     zIndex: 10,
+//   },
+//   title: {
+//     fontSize: 24,
+//     fontWeight: "bold",
+//     color: COLORS.text,
+//     marginBottom: 20,
+//   },
+//   subtitle: {
+//     fontSize: 16,
+//     color: COLORS.textLight,
+//     textAlign: "center",
+//   },
+//   timerContainer: {
+//     alignItems: "center",
+//     marginBottom: 40,
+//   },
+//   timer: {
+//     fontSize: 64,
+//     fontWeight: "bold",
+//     color: COLORS.primary,
+//   },
+//   timerLabel: {
+//     fontSize: 16,
+//     color: COLORS.textLight,
+//     marginTop: 10,
+//   },
+//   fatigueContainer: {
+//     alignItems: "center",
+//     marginBottom: 60,
+//   },
+//   fatigueLabel: {
+//     fontSize: 14,
+//     color: COLORS.textLight,
+//     marginBottom: 5,
+//   },
+//   fatigueValue: {
+//     fontSize: 24,
+//     fontWeight: "600",
+//     color: COLORS.success,
+//   },
+//   fatigueSubtext: {
+//     fontSize: 12,
+//     color: COLORS.textLight,
+//     marginTop: 4,
+//   },
+//   buttonRow: {
+//     flexDirection: "row",
+//     gap: 20,
+//   },
+//   button: {
+//     paddingHorizontal: 30,
+//     paddingVertical: 12,
+//     borderRadius: 20,
+//   },
+//   pauseButton: {
+//     backgroundColor: COLORS.warning,
+//   },
+//   endButton: {
+//     backgroundColor: COLORS.danger,
+//   },
+//   buttonText: {
+//     color: COLORS.white,
+//     fontSize: 16,
+//     fontWeight: "600",
+//   },
+// });

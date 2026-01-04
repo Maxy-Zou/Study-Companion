@@ -1,10 +1,19 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { COLORS } from '../utils/constants';
-import { Session } from '../models/Session';
-import { Metrics } from '../models/Metrics';
-import { SessionStorage, MetricsStorage } from '../services/storageService';
+import * as React from "react";
+import { useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { COLORS } from "../utils/constants";
+import { Session } from "../models/Session";
+import { Metrics } from "../models/Metrics";
+import { SessionStorage, MetricsStorage } from "../services/storageService";
 import {
   calculateSessionStats,
   calculateDailyFatigueData,
@@ -12,13 +21,15 @@ import {
   getRecentSessions,
   formatDuration,
   formatSessionDate,
-} from '../utils/statsAggregator';
-import MetricsChart from '../components/MetricsChart';
-import SessionDetailModal from '../components/SessionDetailModal';
+} from "../utils/statsAggregator";
+import MetricsChart from "../components/MetricsChart";
+import SessionDetailModal from "../components/SessionDetailModal";
 
 export default function HistoryScreen() {
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [metricsMap, setMetricsMap] = useState<Map<string, Metrics[]>>(new Map());
+  const [metricsMap, setMetricsMap] = useState<Map<string, Metrics[]>>(
+    new Map()
+  );
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -49,7 +60,7 @@ export default function HistoryScreen() {
       }
       setMetricsMap(metricsData);
     } catch (error) {
-      console.error('Failed to load history:', error);
+      console.error("Failed to load history:", error);
     } finally {
       setLoading(false);
     }
@@ -67,7 +78,10 @@ export default function HistoryScreen() {
   const avgFatigue = calculateAvgFatigueScore(allMetrics);
 
   // Prepare chart data
-  const dailyFatigueData = calculateDailyFatigueData(recentSessions, metricsMap);
+  const dailyFatigueData = calculateDailyFatigueData(
+    recentSessions,
+    metricsMap
+  );
 
   const renderSessionItem = ({ item }: { item: Session }) => {
     const duration = item.endTs ? item.endTs - item.startTs : 0;
@@ -83,7 +97,9 @@ export default function HistoryScreen() {
         }}
       >
         <View style={styles.sessionHeader}>
-          <Text style={styles.sessionDate}>{formatSessionDate(item.startTs)}</Text>
+          <Text style={styles.sessionDate}>
+            {formatSessionDate(item.startTs)}
+          </Text>
           <Text style={styles.sessionDuration}>{formatDuration(duration)}</Text>
         </View>
 
@@ -133,7 +149,10 @@ export default function HistoryScreen() {
   const hasData = sessions.length > 0;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <Text style={styles.title}>Session History</Text>
 
       {/* Summary Stats */}
@@ -155,12 +174,16 @@ export default function HistoryScreen() {
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>Avg Fatigue</Text>
-          <Text style={styles.statValue}>{avgFatigue > 0 ? avgFatigue : '-'}</Text>
+          <Text style={styles.statValue}>
+            {avgFatigue > 0 ? avgFatigue : "-"}
+          </Text>
         </View>
       </View>
 
       {/* Fatigue Trend Chart */}
-      {hasData && <MetricsChart data={dailyFatigueData} title="7-Day Fatigue Trend" />}
+      {hasData && (
+        <MetricsChart data={dailyFatigueData} title="7-Day Fatigue Trend" />
+      )}
 
       {/* Session List */}
       {hasData ? (
@@ -181,14 +204,18 @@ export default function HistoryScreen() {
       ) : (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No sessions yet</Text>
-          <Text style={styles.emptySubtext}>Start your first work session to see stats</Text>
+          <Text style={styles.emptySubtext}>
+            Start your first work session to see stats
+          </Text>
         </View>
       )}
 
       {/* Session Detail Modal */}
       <SessionDetailModal
         session={selectedSession}
-        metrics={selectedSession ? metricsMap.get(selectedSession.sessionId) || [] : []}
+        metrics={
+          selectedSession ? metricsMap.get(selectedSession.sessionId) || [] : []
+        }
         visible={modalVisible}
         onClose={() => {
           setModalVisible(false);
@@ -210,8 +237,8 @@ const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
     backgroundColor: COLORS.background,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
@@ -220,12 +247,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.text,
     marginBottom: 20,
   },
   statsGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 15,
     marginBottom: 15,
   },
@@ -234,7 +261,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     padding: 15,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   statLabel: {
     fontSize: 12,
@@ -243,12 +270,12 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.primary,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 12,
   },
@@ -262,30 +289,30 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sessionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: "#E0E0E0",
   },
   sessionDate: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
   },
   sessionDuration: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.primary,
   },
   sessionStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   sessionStat: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   sessionStatLabel: {
     fontSize: 11,
@@ -294,12 +321,12 @@ const styles = StyleSheet.create({
   },
   sessionStatValue: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
   },
   emptyState: {
     marginTop: 60,
-    alignItems: 'center',
+    alignItems: "center",
   },
   emptyText: {
     fontSize: 18,

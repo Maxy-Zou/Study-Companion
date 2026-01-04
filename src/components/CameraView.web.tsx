@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../utils/constants';
+import * as React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { COLORS } from "../utils/constants";
 
 interface CameraViewProps {
   enabled: boolean;
@@ -8,7 +8,7 @@ interface CameraViewProps {
 }
 
 export interface FaceData {
-  eyeOpennessAvg: number;  // 0.0-1.0 scale
+  eyeOpennessAvg: number; // 0.0-1.0 scale
   timestamp: number;
 }
 
@@ -17,7 +17,9 @@ export default function CameraView({ enabled }: CameraViewProps) {
   return (
     <View style={styles.disabledContainer}>
       <Text style={styles.disabledText}>Camera Not Available</Text>
-      <Text style={styles.disabledSubtext}>Camera features only work on mobile apps</Text>
+      <Text style={styles.disabledSubtext}>
+        Camera features only work on mobile apps
+      </Text>
     </View>
   );
 }
@@ -30,21 +32,21 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderWidth: 2,
     borderColor: COLORS.textLight,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 12,
   },
   disabledText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 4,
   },
   disabledSubtext: {
     fontSize: 10,
     color: COLORS.textLight,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

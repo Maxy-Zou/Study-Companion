@@ -1,7 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { UserSettings, DEFAULT_USER_SETTINGS } from '../models/UserSettings';
-import { SettingsStorage, initializeDatabase } from '../services/storageService';
+import * as React from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { v4 as uuidv4 } from "uuid";
+import { UserSettings, DEFAULT_USER_SETTINGS } from "../models/UserSettings";
+import {
+  SettingsStorage,
+  initializeDatabase,
+} from "../services/storageService";
 
 interface SettingsContextType {
   settings: UserSettings;
@@ -10,7 +20,9 @@ interface SettingsContextType {
   resetSettings: () => Promise<void>;
 }
 
-const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
+const SettingsContext = createContext<SettingsContextType | undefined>(
+  undefined
+);
 
 interface SettingsProviderProps {
   children: ReactNode;
@@ -41,7 +53,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
 
         setSettings(loadedSettings);
       } catch (error) {
-        console.error('Failed to initialize settings:', error);
+        console.error("Failed to initialize settings:", error);
         // Use defaults on error
         setSettings({
           ...DEFAULT_USER_SETTINGS,
@@ -61,7 +73,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       await SettingsStorage.save(updated);
       setSettings(updated);
     } catch (error) {
-      console.error('Failed to update settings:', error);
+      console.error("Failed to update settings:", error);
       throw error;
     }
   };
@@ -75,7 +87,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       await SettingsStorage.save(resetWithId);
       setSettings(resetWithId);
     } catch (error) {
-      console.error('Failed to reset settings:', error);
+      console.error("Failed to reset settings:", error);
       throw error;
     }
   };
@@ -87,13 +99,17 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     resetSettings,
   };
 
-  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
+  return (
+    <SettingsContext.Provider value={value}>
+      {children}
+    </SettingsContext.Provider>
+  );
 }
 
 export function useSettings(): SettingsContextType {
   const context = useContext(SettingsContext);
   if (!context) {
-    throw new Error('useSettings must be used within SettingsProvider');
+    throw new Error("useSettings must be used within SettingsProvider");
   }
   return context;
 }

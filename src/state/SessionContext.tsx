@@ -1,13 +1,20 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Session, SessionState, SessionEvent } from '../models/Session';
+import * as React from "react";
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  ReactNode,
+} from "react";
+import { v4 as uuidv4 } from "uuid";
+import { Session, SessionState, SessionEvent } from "../models/Session";
 import {
   sessionReducer,
   initialSessionMachineState,
   SessionAction,
   SessionMachineState,
-} from '../services/sessionStateMachine';
-import { SessionStorage } from '../services/storageService';
+} from "../services/sessionStateMachine";
+import { SessionStorage } from "../services/storageService";
 
 interface SessionContextType {
   currentState: SessionState;
@@ -30,7 +37,10 @@ interface SessionProviderProps {
 }
 
 export function SessionProvider({ children }: SessionProviderProps) {
-  const [state, dispatch] = useReducer(sessionReducer, initialSessionMachineState);
+  const [state, dispatch] = useReducer(
+    sessionReducer,
+    initialSessionMachineState
+  );
 
   // Auto-save session to database whenever it changes
   useEffect(() => {
@@ -38,7 +48,9 @@ export function SessionProvider({ children }: SessionProviderProps) {
       const saveSession = async () => {
         try {
           // Check if session exists in DB
-          const existing = await SessionStorage.getById(state.session!.sessionId);
+          const existing = await SessionStorage.getById(
+            state.session!.sessionId
+          );
 
           if (existing) {
             // Update existing session
@@ -48,7 +60,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
             await SessionStorage.insert(state.session!);
           }
         } catch (error) {
-          console.error('Failed to save session:', error);
+          console.error("Failed to save session:", error);
         }
       };
 
@@ -83,7 +95,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
           endTs: Date.now(),
         });
       } catch (error) {
-        console.error('Failed to save final session state:', error);
+        console.error("Failed to save final session state:", error);
       }
     }
   };
@@ -118,13 +130,15 @@ export function SessionProvider({ children }: SessionProviderProps) {
     ignoreBreak,
   };
 
-  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+  );
 }
 
 export function useSession(): SessionContextType {
   const context = useContext(SessionContext);
   if (!context) {
-    throw new Error('useSession must be used within SessionProvider');
+    throw new Error("useSession must be used within SessionProvider");
   }
   return context;
 }

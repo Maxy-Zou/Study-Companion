@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, Alert, Platform } from 'react-native';
-import { COLORS } from '../utils/constants';
-import { useSettings } from '../state/SettingsContext';
-import ConsentModal from '../components/ConsentModal';
+import * as React from "react";
+import { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Switch,
+  Alert,
+  Platform,
+} from "react-native";
+import { COLORS } from "../utils/constants";
+import { useSettings } from "../state/SettingsContext";
+import ConsentModal from "../components/ConsentModal";
 
 // Conditionally import Camera (only on native platforms)
 let Camera: any;
-if (Platform.OS !== 'web') {
-  Camera = require('expo-camera').Camera;
+if (Platform.OS !== "web") {
+  Camera = require("expo-camera").Camera;
 }
 
 export default function SettingsScreen() {
@@ -28,11 +37,11 @@ export default function SettingsScreen() {
     setShowConsentModal(false);
 
     // On web, camera not available
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       Alert.alert(
-        'Camera Not Available',
-        'Camera features only work on mobile apps.',
-        [{ text: 'OK' }]
+        "Camera Not Available",
+        "Camera features only work on mobile apps.",
+        [{ text: "OK" }]
       );
       return;
     }
@@ -40,13 +49,13 @@ export default function SettingsScreen() {
     // Request OS-level camera permission
     const { status } = await Camera.requestCameraPermissionsAsync();
 
-    if (status === 'granted') {
+    if (status === "granted") {
       await updateSettings({ cameraEnabled: true });
     } else {
       Alert.alert(
-        'Camera Permission Required',
-        'Please enable camera access in your device settings to use fatigue detection.',
-        [{ text: 'OK' }]
+        "Camera Permission Required",
+        "Please enable camera access in your device settings to use fatigue detection.",
+        [{ text: "OK" }]
       );
     }
   };
@@ -59,12 +68,15 @@ export default function SettingsScreen() {
     try {
       await updateSettings({ [key]: value });
     } catch (error) {
-      console.error('Failed to update setting:', error);
+      console.error("Failed to update setting:", error);
     }
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <Text style={styles.title}>Settings</Text>
 
       <View style={styles.section}>
@@ -80,7 +92,7 @@ export default function SettingsScreen() {
           <Switch
             value={settings.cameraEnabled}
             onValueChange={handleCameraToggle}
-            trackColor={{ false: '#CCC', true: COLORS.primary }}
+            trackColor={{ false: "#CCC", true: COLORS.primary }}
           />
         </View>
 
@@ -93,8 +105,10 @@ export default function SettingsScreen() {
           </View>
           <Switch
             value={settings.azureTelemetryEnabled}
-            onValueChange={(value) => handleToggle('azureTelemetryEnabled', value)}
-            trackColor={{ false: '#CCC', true: COLORS.primary }}
+            onValueChange={(value) =>
+              handleToggle("azureTelemetryEnabled", value)
+            }
+            trackColor={{ false: "#CCC", true: COLORS.primary }}
           />
         </View>
       </View>
@@ -111,8 +125,10 @@ export default function SettingsScreen() {
           </View>
           <Switch
             value={settings.notificationsEnabled}
-            onValueChange={(value) => handleToggle('notificationsEnabled', value)}
-            trackColor={{ false: '#CCC', true: COLORS.primary }}
+            onValueChange={(value) =>
+              handleToggle("notificationsEnabled", value)
+            }
+            trackColor={{ false: "#CCC", true: COLORS.primary }}
           />
         </View>
       </View>
@@ -120,7 +136,8 @@ export default function SettingsScreen() {
       <View style={styles.privacyNotice}>
         <Text style={styles.privacyTitle}>🔒 Privacy First</Text>
         <Text style={styles.privacyText}>
-          All camera processing happens on your device. No images are ever stored or uploaded.
+          All camera processing happens on your device. No images are ever
+          stored or uploaded.
         </Text>
       </View>
 
@@ -143,7 +160,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.text,
     marginBottom: 20,
   },
@@ -152,14 +169,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 15,
   },
   settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: COLORS.white,
     padding: 15,
     borderRadius: 12,
@@ -171,7 +188,7 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 4,
   },
@@ -180,14 +197,14 @@ const styles = StyleSheet.create({
     color: COLORS.textLight,
   },
   privacyNotice: {
-    backgroundColor: COLORS.primary + '15',
+    backgroundColor: COLORS.primary + "15",
     padding: 20,
     borderRadius: 12,
     marginTop: 20,
   },
   privacyTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.primary,
     marginBottom: 8,
   },

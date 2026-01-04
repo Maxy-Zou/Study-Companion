@@ -1,9 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native';
-import { Session } from '../models/Session';
-import { Metrics } from '../models/Metrics';
-import { COLORS } from '../utils/constants';
-import { formatDuration, calculateAvgFatigueScore } from '../utils/statsAggregator';
+import * as React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { Session } from "../models/Session";
+import { Metrics } from "../models/Metrics";
+import { COLORS } from "../utils/constants";
+import {
+  formatDuration,
+  calculateAvgFatigueScore,
+} from "../utils/statsAggregator";
 
 interface SessionDetailModalProps {
   session: Session | null;
@@ -23,26 +33,38 @@ export default function SessionDetailModal({
   const duration = session.endTs ? session.endTs - session.startTs : 0;
   const avgFatigue = calculateAvgFatigueScore(metrics);
   const totalBreaks = session.acceptedBreaks + session.ignoredBreaks;
-  const acceptanceRate = totalBreaks > 0 ? Math.round((session.acceptedBreaks / totalBreaks) * 100) : 0;
+  const acceptanceRate =
+    totalBreaks > 0
+      ? Math.round((session.acceptedBreaks / totalBreaks) * 100)
+      : 0;
 
   // Calculate metrics summary
   const avgBlinkRate =
     metrics.length > 0
       ? Math.round(
-          metrics.reduce((sum, m) => sum + (m.blinkRatePerMin || 0), 0) / metrics.length
+          metrics.reduce((sum, m) => sum + (m.blinkRatePerMin || 0), 0) /
+            metrics.length
         )
       : 0;
 
   const avgEyeOpenness =
     metrics.length > 0
-      ? (metrics.reduce((sum, m) => sum + (m.eyeOpennessAvg || 0), 0) / metrics.length).toFixed(2)
-      : '0.00';
+      ? (
+          metrics.reduce((sum, m) => sum + (m.eyeOpennessAvg || 0), 0) /
+          metrics.length
+        ).toFixed(2)
+      : "0.00";
 
   const startDate = new Date(session.startTs);
   const endDate = session.endTs ? new Date(session.endTs) : null;
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <View style={styles.overlay}>
         <View style={styles.container}>
           <View style={styles.header}>
@@ -59,11 +81,11 @@ export default function SessionDetailModal({
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Started:</Text>
                 <Text style={styles.infoValue}>
-                  {startDate.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
+                  {startDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
                   })}
                 </Text>
               </View>
@@ -71,18 +93,20 @@ export default function SessionDetailModal({
                 <Text style={styles.infoLabel}>Ended:</Text>
                 <Text style={styles.infoValue}>
                   {endDate
-                    ? endDate.toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
+                    ? endDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
                       })
-                    : 'In progress'}
+                    : "In progress"}
                 </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Duration:</Text>
-                <Text style={[styles.infoValue, styles.highlight]}>{formatDuration(duration)}</Text>
+                <Text style={[styles.infoValue, styles.highlight]}>
+                  {formatDuration(duration)}
+                </Text>
               </View>
             </View>
 
@@ -132,7 +156,9 @@ export default function SessionDetailModal({
               {session.baselineBlinkRate && (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Baseline Blink Rate:</Text>
-                  <Text style={styles.infoValue}>{Math.round(session.baselineBlinkRate)}/min</Text>
+                  <Text style={styles.infoValue}>
+                    {Math.round(session.baselineBlinkRate)}/min
+                  </Text>
                 </View>
               )}
               {avgBlinkRate > 0 && (
@@ -155,7 +181,9 @@ export default function SessionDetailModal({
 
             {/* Session ID (for debugging) */}
             <View style={styles.debugSection}>
-              <Text style={styles.debugText}>Session ID: {session.sessionId.substring(0, 8)}...</Text>
+              <Text style={styles.debugText}>
+                Session ID: {session.sessionId.substring(0, 8)}...
+              </Text>
             </View>
           </ScrollView>
         </View>
@@ -167,26 +195,26 @@ export default function SessionDetailModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
   },
   container: {
     backgroundColor: COLORS.white,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '80%',
+    maxHeight: "80%",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: "#E0E0E0",
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.text,
   },
   closeButton: {
@@ -194,8 +222,8 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     backgroundColor: COLORS.background,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   closeButtonText: {
     fontSize: 20,
@@ -209,14 +237,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 12,
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 8,
   },
   infoLabel: {
@@ -225,22 +253,22 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
     color: COLORS.text,
   },
   highlight: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   debugSection: {
     marginTop: 20,
     paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: "#E0E0E0",
   },
   debugText: {
     fontSize: 11,
     color: COLORS.textLight,
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
   },
 });

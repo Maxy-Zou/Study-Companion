@@ -1,12 +1,19 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Metrics } from '../models/Metrics';
-import { BreakRecommendation } from '../models/Recommendation';
-import { FaceData } from '../components/CameraView';
-import { fatigueDetector } from '../services/fatigueDetector';
-import { recommendationEngine } from '../services/recommendationEngine';
-import { MetricsStorage } from '../services/storageService';
-import { useSession } from './SessionContext';
-import { SessionState } from '../models/Session';
+import * as React from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { Metrics } from "../models/Metrics";
+import { BreakRecommendation } from "../models/Recommendation";
+import { FaceData } from "../components/CameraView";
+import { fatigueDetector } from "../services/fatigueDetector";
+import { recommendationEngine } from "../services/recommendationEngine";
+import { MetricsStorage } from "../services/storageService";
+import { useSession } from "./SessionContext";
+import { SessionState } from "../models/Session";
 
 interface MetricsContextType {
   currentMetrics: Metrics | null;
@@ -29,13 +36,17 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
   const { session, currentState, acceptBreak, ignoreBreak } = useSession();
   const [currentMetrics, setCurrentMetrics] = useState<Metrics | null>(null);
   const [currentFatigueScore, setCurrentFatigueScore] = useState(0);
-  const [baselineBlinkRate, setBaselineBlinkRate] = useState<number | null>(null);
-  const [currentRecommendation, setCurrentRecommendation] = useState<BreakRecommendation | null>(null);
+  const [baselineBlinkRate, setBaselineBlinkRate] = useState<number | null>(
+    null
+  );
+  const [currentRecommendation, setCurrentRecommendation] =
+    useState<BreakRecommendation | null>(null);
 
   // Start/stop fatigue detector based on session state
   useEffect(() => {
     const isWorkingOrBreak =
-      currentState === SessionState.WORKING || currentState === SessionState.BREAK;
+      currentState === SessionState.WORKING ||
+      currentState === SessionState.BREAK;
 
     if (isWorkingOrBreak && session) {
       // Start detector
@@ -57,7 +68,10 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
 
   // Update fatigue score periodically
   useEffect(() => {
-    if (currentState !== SessionState.WORKING && currentState !== SessionState.BREAK) {
+    if (
+      currentState !== SessionState.WORKING &&
+      currentState !== SessionState.BREAK
+    ) {
       return;
     }
 
@@ -85,7 +99,10 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
     const evaluateRecommendations = async () => {
       try {
         // Get recent metrics from storage (last 30 data points = last 60 seconds at 0.5 fps)
-        const recentMetrics = await MetricsStorage.getRecent(session.sessionId, 30);
+        const recentMetrics = await MetricsStorage.getRecent(
+          session.sessionId,
+          30
+        );
 
         // Evaluate recommendation rules
         const recommendation = recommendationEngine.evaluate(
@@ -98,7 +115,7 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
           setCurrentRecommendation(recommendation);
         }
       } catch (error) {
-        console.error('Failed to evaluate recommendations:', error);
+        console.error("Failed to evaluate recommendations:", error);
       }
     };
 
@@ -134,7 +151,7 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
     // Trigger break in session
     acceptBreak();
 
-    console.log('Break recommendation accepted');
+    console.log("Break recommendation accepted");
   };
 
   const snoozeRecommendation = () => {
@@ -146,7 +163,7 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
     // Snooze engine for 5 minutes
     recommendationEngine.snooze();
 
-    console.log('Break recommendation snoozed for 5 minutes');
+    console.log("Break recommendation snoozed for 5 minutes");
   };
 
   const ignoreRecommendation = () => {
@@ -158,7 +175,7 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
     // Track ignored break in session
     ignoreBreak();
 
-    console.log('Break recommendation ignored');
+    console.log("Break recommendation ignored");
   };
 
   const value: MetricsContextType = {
@@ -172,13 +189,15 @@ export function MetricsProvider({ children }: MetricsProviderProps) {
     ignoreRecommendation,
   };
 
-  return <MetricsContext.Provider value={value}>{children}</MetricsContext.Provider>;
+  return (
+    <MetricsContext.Provider value={value}>{children}</MetricsContext.Provider>
+  );
 }
 
 export function useMetrics(): MetricsContextType {
   const context = useContext(MetricsContext);
   if (!context) {
-    throw new Error('useMetrics must be used within MetricsProvider');
+    throw new Error("useMetrics must be used within MetricsProvider");
   }
   return context;
 }

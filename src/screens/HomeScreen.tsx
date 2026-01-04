@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { COLORS } from '../utils/constants';
-import { useSession } from '../state/SessionContext';
-import { SessionStorage } from '../services/storageService';
-import { SessionState } from '../models/Session';
+import * as React from "react";
+import { useState, useCallback } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { COLORS } from "../utils/constants";
+import { useSession } from "../state/SessionContext";
+import { SessionStorage } from "../services/storageService";
+import { SessionState } from "../models/Session";
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -15,11 +16,11 @@ export default function HomeScreen() {
   const loadStats = useCallback(async () => {
     try {
       const sessions = await SessionStorage.getAll();
-      const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-      const recentSessions = sessions.filter(s => s.startTs > oneWeekAgo);
+      const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const recentSessions = sessions.filter((s) => s.startTs > oneWeekAgo);
       setWeeklySessionCount(recentSessions.length);
     } catch (error) {
-      console.error('Failed to load weekly sessions:', error);
+      console.error("Failed to load weekly sessions:", error);
     }
   }, []);
 
@@ -32,7 +33,7 @@ export default function HomeScreen() {
   const handleStartSession = () => {
     startSession();
     // Navigate to Session screen
-    (navigation as any).navigate('Session');
+    (navigation as any).navigate("Session");
   };
 
   const isSessionActive = currentState !== SessionState.IDLE;
@@ -40,7 +41,9 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Study Companion</Text>
-      <Text style={styles.subtitle}>Privacy-First Mental Fatigue Management</Text>
+      <Text style={styles.subtitle}>
+        Privacy-First Mental Fatigue Management
+      </Text>
 
       <TouchableOpacity
         style={[styles.button, isSessionActive && styles.buttonDisabled]}
@@ -48,7 +51,7 @@ export default function HomeScreen() {
         disabled={isSessionActive}
       >
         <Text style={styles.buttonText}>
-          {isSessionActive ? 'Session Active' : 'Start Work Session'}
+          {isSessionActive ? "Session Active" : "Start Work Session"}
         </Text>
       </TouchableOpacity>
 
@@ -64,13 +67,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.text,
     marginBottom: 10,
   },
@@ -78,7 +81,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.textLight,
     marginBottom: 40,
-    textAlign: 'center',
+    textAlign: "center",
   },
   button: {
     backgroundColor: COLORS.primary,
@@ -93,10 +96,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   statsContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statsLabel: {
     fontSize: 14,
@@ -105,7 +108,7 @@ const styles = StyleSheet.create({
   },
   statsValue: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: COLORS.primary,
   },
 });
