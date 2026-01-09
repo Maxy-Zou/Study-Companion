@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Companion - Focus & Wellness Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">📚</span>
+                <h1>Study Companion</h1>
+            </div>
+            <p class="tagline">Your smart study partner for focused, healthy learning</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="session">
+                <span class="tab-icon">⏱️</span>
+                Active Session
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <span class="tab-icon">📊</span>
+                History
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Active Session Tab -->
+            <div id="session-tab" class="tab-content active">
+                <div class="session-container">
+                    <!-- Camera Placeholder -->
+                    <div class="camera-placeholder">
+                        <div class="camera-icon">📷</div>
+                        <p>Camera Preview</p>
+                    </div>
+
+                    <!-- Timer Display -->
+                    <div class="timer-section">
+                        <div class="timer-display" id="timer">25:00</div>
+                        <div class="timer-label" id="timer-label">Ready to Focus</div>
+                    </div>
+
+                    <!-- Session Controls -->
+                    <div class="control-buttons">
+                        <button class="btn btn-primary btn-large" id="start-btn">
+                            <span class="btn-icon">▶️</span>
+                            Start Session
+                        </button>
+                        <button class="btn btn-warning btn-large hidden" id="pause-btn">
+                            <span class="btn-icon">⏸️</span>
+                            Pause
+                        </button>
+                        <button class="btn btn-success btn-large hidden" id="resume-btn">
+                            <span class="btn-icon">▶️</span>
+                            Resume
+                        </button>
+                        <button class="btn btn-danger hidden" id="end-btn">
+                            <span class="btn-icon">⏹️</span>
+                            End Session
+                        </button>
+                    </div>
+
+                    <!-- Session Info -->
+                    <div class="session-info hidden" id="session-info">
+                        <div class="info-card">
+                            <span class="info-label">Session Time</span>
+                            <span class="info-value" id="elapsed-time">0m</span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Breaks Taken</span>
+                            <span class="info-value" id="breaks-count">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="history-container">
+                    <h2 class="section-title">Your Study Journey</h2>
+                    
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total Sessions</div>
+                                <div class="stat-value">15</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏰</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total Study Time</div>
+                                <div class="stat-value">11h 20m</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Avg Session</div>
+                                <div class="stat-value">45 min</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">☕</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Break Rate</div>
+                                <div class="stat-value">78%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Section -->
+                    <div class="chart-section">
+                        <h3 class="subsection-title">Weekly Activity</h3>
+                        <canvas id="activity-chart"></canvas>
+                    </div>
+
+                    <!-- Recent Sessions -->
+                    <div class="sessions-section">
+                        <h3 class="subsection-title">Recent Sessions</h3>
+                        <div class="sessions-list" id="sessions-list">
+                            <!-- Sessions will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Demo Controls Footer -->
+        <footer class="demo-controls">
+            <div class="demo-controls-label">🎮 Demo Controls:</div>
+            <button class="btn btn-secondary btn-small" id="trigger-break-demo">
+                <span class="btn-icon">😴</span>
+                Show Break Popup
+            </button>
+            <button class="btn btn-secondary btn-small" id="trigger-water-demo">
+                <span class="btn-icon">💧</span>
+                Show Water Popup
+            </button>
+        </footer>
+    </div>
+
+    <!-- Break Reminder Modal -->
+    <div class="modal-overlay hidden" id="break-modal">
+        <div class="modal">
+            <div class="modal-icon">😴</div>
+            <h2 class="modal-title">Time for a Break!</h2>
+            <p class="modal-message" id="break-message">
+                You've been studying for a while. Taking short breaks helps maintain focus and prevents burnout.
+            </p>
+            <div class="modal-duration">
+                <span class="duration-label">Suggested:</span>
+                <span class="duration-value">5 minutes</span>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="dismiss-break">Dismiss</button>
+                <button class="btn btn-warning" id="snooze-break">Snooze 5m</button>
+                <button class="btn btn-primary" id="accept-break">Take Break</button>
+            </div>
+            <p class="modal-tip">💡 Regular breaks improve retention and reduce eye strain</p>
+        </div>
+    </div>
+
+    <!-- Water Reminder Modal -->
+    <div class="modal-overlay hidden" id="water-modal">
+        <div class="modal">
+            <div class="modal-icon">💧</div>
+            <h2 class="modal-title">Stay Hydrated!</h2>
+            <p class="modal-message">
+                Don't forget to drink water. Staying hydrated helps with concentration and cognitive function.
+            </p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="dismiss-water">Dismiss</button>
+                <button class="btn btn-primary" id="accept-water">Got it!</button>
+            </div>
+            <p class="modal-tip">💡 Aim for 8 glasses of water per day</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
